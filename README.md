@@ -6,6 +6,7 @@ rep+ is a lightweight Chrome DevTools extension inspired by Burp Suite's Repeate
 
 ## What it does
 
+- **No Proxy Setup**: Works directly in Chrome. No need to configure system proxies or install CA certificates like in Burp Suite.
 - **Capture & Replay**: Captures every HTTP request you trigger while testing. Replay any request and freely manipulate the raw method, path, headers, or body to probe endpoints.
 - **Filters & Regex**: Powerful search across URL, headers, and body. Toggle **Regex Mode** for advanced pattern matching (e.g., finding specific tokens or IDs).
 - **Converters**: Right-click context menu to instantly encode/decode data:
