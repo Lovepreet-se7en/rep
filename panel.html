@@ -28,6 +28,13 @@
                     </button>
                     <div class="divider-vertical"
                         style="width: 1px; height: 20px; background: var(--border-color); margin: 0 4px;"></div>
+                    <button id="settings-btn" class="icon-btn">
+                        <svg viewBox="0 0 24 24" width="14" height="14">
+                            <path
+                                d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7.5 13a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5m9 0a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5"
+                                fill="currentColor" />
+                        </svg>
+                    </button>
                     <button id="import-btn" class="icon-btn">
                         <svg viewBox="0 0 24 24" width="14" height="14">
                             <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="currentColor" />
@@ -67,8 +74,15 @@
                     <div class="pane-header">
                         <h3>Request</h3>
                         <div class="header-actions">
+                            <button id="explain-btn" class="icon-btn" title="Ask AI to explain this request">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path
+                                        d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"
+                                        fill="currentColor" />
+                                </svg>
+                            </button>
                             <button id="bulk-replay-btn" class="icon-btn"
-                                data-tooltip="Bulk Replay - Mark parameters with § to start attack">
+                                title="Bulk Replay - Mark parameters with § to start attack" disabled>
                                 <svg viewBox="0 0 24 24" width="16" height="16">
                                     <path d="M7 2v11h3v9l7-12h-4l4-8z" fill="currentColor" />
                                 </svg>
@@ -296,7 +310,53 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="anthropic-api-key">Anthropic API Key</label>
+                    <input type="password" id="anthropic-api-key" class="form-control" placeholder="sk-ant-...">
+                    <p class="help-text">Required for "Explain Request" feature. Stored locally.</p>
+                </div>
+                <div class="form-group">
+                    <label for="anthropic-model">Model</label>
+                    <select id="anthropic-model" class="form-control">
+                        <option value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet (Oct 2024)</option>
+                        <option value="claude-3-5-sonnet-20240620">Claude 3.5 Sonnet (Jun 2024)</option>
+                        <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+                        <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-settings-btn" class="primary-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Explanation Modal -->
+    <div id="explanation-modal" class="modal">
+        <div class="modal-content" style="width: 700px; max-width: 90vw;">
+            <div class="modal-header">
+                <h3>Request Explanation</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="explanation-content" class="markdown-body" style="line-height: 1.6; font-size: 14px;">
+                    <!-- Content populated by JS -->
+                    <div class="loading-spinner">Generating explanation...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="html2canvas.min.js"></script>
+    <script src="marked.min.js"></script>
     <script src="syntax-highlight.js"></script>
     <script src="attack-modes.js"></script>
     <script src="panel.js"></script>
