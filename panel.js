@@ -2045,9 +2045,9 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(rawRequestInput, { childList: true, subtree: true, characterData: true });
     }
 
-    // State for payload configurations
-    let payloadConfigs = {};
-    let currentConfigIndex = 0;
+    // State for payload configurations (now per-position)
+    let positionConfigs = [];
+    let currentAttackType = 'sniper';
 
     // Bulk Replay Button
     if (bulkReplayBtn) {
@@ -2060,88 +2060,127 @@ document.addEventListener('DOMContentLoaded', () => {
             const count = matches ? matches.length : 0;
             document.getElementById('payload-count').textContent = count;
 
-            // Reset Configs
-            payloadConfigs = {};
-            currentConfigIndex = 0;
-
-            // Populate Position Select
-            const positionSelect = document.getElementById('payload-position-select');
-            positionSelect.innerHTML = '';
-
-            if (matches) {
-                matches.forEach((match, index) => {
-                    const option = document.createElement('option');
-                    option.value = index;
-                    // Show a snippet of the value
-                    const cleanValue = match.replace(/§/g, '');
-                    option.textContent = `Position ${index + 1} (${cleanValue.substring(0, 20)}${cleanValue.length > 20 ? '...' : ''})`;
-                    positionSelect.appendChild(option);
-
-                    // Initialize default config
-                    payloadConfigs[index] = {
-                        type: 'simple-list',
-                        list: '',
-                        numbers: { from: 1, to: 10, step: 1 }
-                    };
-                });
+            if (!matches || count === 0) {
+                alert('No payload positions found. Mark parameters with § to enable Bulk Replay.');
+                return;
             }
 
-            // Load initial state (Index 0)
-            loadPayloadConfig(0);
+            // Initialize position configs
+            positionConfigs = matches.map((match, index) => ({
+                index,
+                originalValue: match.replace(/§/g, ''),
+                type: 'simple-list',
+                list: '',
+                numbers: { from: 1, to: 10, step: 1 }
+            }));
+
+            // Populate positions container
+            populatePositionsContainer(matches);
+
+            // Set default attack type
+            currentAttackType = 'sniper';
+            document.getElementById('attack-type').value = 'sniper';
+            updateAttackTypeUI('sniper');
 
             bulkConfigModal.style.display = 'block';
         });
     }
 
-    // Position Select Change
-    const positionSelect = document.getElementById('payload-position-select');
-    if (positionSelect) {
-        positionSelect.addEventListener('focus', () => {
-            // Store previous index before change
-            positionSelect.dataset.prevIndex = positionSelect.value;
-        });
+    // Populate positions container based on attack type
+    function populatePositionsContainer(matches) {
+        const container = document.getElementById('positions-container');
+        container.innerHTML = '';
 
-        positionSelect.addEventListener('change', (e) => {
-            const newIndex = parseInt(e.target.value);
-            const prevIndex = parseInt(positionSelect.dataset.prevIndex || 0);
+        matches.forEach((match, index) => {
+            const cleanValue = match.replace(/§/g, '');
+            const card = document.createElement('div');
+            card.className = 'position-card';
+            card.dataset.index = index;
+            card.innerHTML = `
+                <div class="position-card-header">
+                    <span class="position-title">Position ${index + 1}</span>
+                    <span class="position-value">${cleanValue.substring(0, 30)}${cleanValue.length > 30 ? '...' : ''}</span>
+                </div>
+                <div class="form-group">
+                    <label>Payload Type</label>
+                    <select class="payload-type-select form-control" data-index="${index}">
+                        <option value="simple-list">Simple List</option>
+                        <option value="numbers">Numbers</option>
+                    </select>
+                </div>
+                <div class="payload-options-simple-list">
+                    <div class="form-group">
+                        <label>Payloads (one per line)</label>
+                        <textarea class="payload-list-input form-control" rows="5" data-index="${index}" placeholder="admin&#10;user&#10;guest"></textarea>
+                    </div>
+                </div>
+                <div class="payload-options-numbers" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>From</label>
+                            <input type="number" class="num-from-input form-control" data-index="${index}" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label>To</label>
+                            <input type="number" class="num-to-input form-control" data-index="${index}" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Step</label>
+                            <input type="number" class="num-step-input form-control" data-index="${index}" value="1">
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
 
-            // Save config for previous index
-            savePayloadConfig(prevIndex);
-
-            // Load config for new index
-            loadPayloadConfig(newIndex);
-
-            currentConfigIndex = newIndex;
-            positionSelect.dataset.prevIndex = newIndex;
+            // Add event listener for payload type toggle
+            const typeSelect = card.querySelector('.payload-type-select');
+            typeSelect.addEventListener('change', (e) => {
+                const card = e.target.closest('.position-card');
+                const simpleList = card.querySelector('.payload-options-simple-list');
+                const numbers = card.querySelector('.payload-options-numbers');
+                if (e.target.value === 'simple-list') {
+                    simpleList.style.display = 'block';
+                    numbers.style.display = 'none';
+                } else {
+                    simpleList.style.display = 'none';
+                    numbers.style.display = 'block';
+                }
+            });
         });
     }
 
-    function savePayloadConfig(index) {
-        if (!payloadConfigs[index]) payloadConfigs[index] = {};
+    // Attack Type Change Handler
+    const attackTypeSelect = document.getElementById('attack-type');
+    if (attackTypeSelect) {
+        attackTypeSelect.addEventListener('change', (e) => {
+            currentAttackType = e.target.value;
+            updateAttackTypeUI(e.target.value);
+        });
+    }
 
-        payloadConfigs[index].type = payloadTypeSelect.value;
-        payloadConfigs[index].list = document.getElementById('payload-list').value;
-        payloadConfigs[index].numbers = {
-            from: document.getElementById('num-from').value,
-            to: document.getElementById('num-to').value,
-            step: document.getElementById('num-step').value
+    // Update UI based on attack type
+    function updateAttackTypeUI(attackType) {
+        const positionsContainer = document.getElementById('positions-container');
+        const batteringRamConfig = document.getElementById('battering-ram-config');
+        const helpText = document.getElementById('attack-type-help');
+
+        // Update help text
+        const helpTexts = {
+            'sniper': 'Sniper: Tests each position independently with its own payloads. Others remain unchanged.',
+            'battering-ram': 'Battering Ram: All positions receive the same payload value from a shared list.',
+            'pitchfork': 'Pitchfork: Zips payloads across positions (index-wise). Stops at shortest list.',
+            'cluster-bomb': 'Cluster Bomb: Tests all combinations of payloads across positions (Cartesian product).'
         };
-    }
+        helpText.textContent = helpTexts[attackType] || '';
 
-    function loadPayloadConfig(index) {
-        const config = payloadConfigs[index];
-        if (!config) return;
-
-        // Set Type
-        payloadTypeSelect.value = config.type;
-        payloadTypeSelect.dispatchEvent(new Event('change')); // Trigger UI update
-
-        // Set Values
-        document.getElementById('payload-list').value = config.list || '';
-        if (config.numbers) {
-            document.getElementById('num-from').value = config.numbers.from || 1;
-            document.getElementById('num-to').value = config.numbers.to || 10;
-            document.getElementById('num-step').value = config.numbers.step || 1;
+        // Show/hide UI elements based on attack type
+        if (attackType === 'battering-ram') {
+            positionsContainer.style.display = 'none';
+            batteringRamConfig.style.display = 'block';
+        } else {
+            positionsContainer.style.display = 'block';
+            batteringRamConfig.style.display = 'none';
         }
     }
 
@@ -2158,14 +2197,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Payload Type Toggle
-    if (payloadTypeSelect) {
-        payloadTypeSelect.addEventListener('change', (e) => {
-            document.querySelectorAll('.payload-options').forEach(el => el.style.display = 'none');
+    // Battering Ram Payload Type Toggle
+    const batteringRamTypeSelect = document.querySelector('#battering-ram-config .payload-type-select');
+    if (batteringRamTypeSelect) {
+        batteringRamTypeSelect.addEventListener('change', (e) => {
+            const container = document.getElementById('battering-ram-config');
+            const simpleList = container.querySelector('.payload-options-simple-list');
+            const numbers = container.querySelector('.payload-options-numbers');
             if (e.target.value === 'simple-list') {
-                document.getElementById('options-simple-list').style.display = 'block';
-            } else if (e.target.value === 'numbers') {
-                document.getElementById('options-numbers').style.display = 'block';
+                simpleList.style.display = 'block';
+                numbers.style.display = 'none';
+            } else {
+                simpleList.style.display = 'none';
+                numbers.style.display = 'block';
             }
         });
     }
@@ -2173,10 +2217,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start Attack
     if (startAttackBtn) {
         startAttackBtn.addEventListener('click', () => {
-            // Save current config before starting
-            savePayloadConfig(currentConfigIndex);
-
-            bulkConfigModal.style.display = 'none';
             startBulkReplay();
         });
     }
@@ -2262,34 +2302,69 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function startBulkReplay() {
-        const targetIndex = parseInt(document.getElementById('payload-position-select').value);
-        const config = payloadConfigs[targetIndex]; // Use stored config
+        // Read configs from UI
+        const template = rawRequestInput.innerText;
 
-        if (!config) {
-            alert('Configuration error.');
+        // Read position configs based on attack type
+        if (currentAttackType === 'battering-ram') {
+            // Battering Ram: Read shared config
+            const container = document.getElementById('battering-ram-config');
+            const type = container.querySelector('.payload-type-select').value;
+            const sharedConfig = {
+                type,
+                list: type === 'simple-list' ? container.querySelector('.payload-list-input').value : '',
+                numbers: type === 'numbers' ? {
+                    from: parseInt(container.querySelector('.num-from-input').value),
+                    to: parseInt(container.querySelector('.num-to-input').value),
+                    step: parseInt(container.querySelector('.num-step-input').value)
+                } : { from: 1, to: 10, step: 1 }
+            };
+
+            // Apply shared config to all positions
+            positionConfigs.forEach(config => {
+                config.type = sharedConfig.type;
+                config.list = sharedConfig.list;
+                config.numbers = sharedConfig.numbers;
+            });
+        } else {
+            // Other modes: Read per-position configs
+            const cards = document.querySelectorAll('.position-card');
+            cards.forEach((card, index) => {
+                const type = card.querySelector('.payload-type-select').value;
+                positionConfigs[index].type = type;
+                positionConfigs[index].list = type === 'simple-list' ?
+                    card.querySelector('.payload-list-input').value : '';
+                positionConfigs[index].numbers = type === 'numbers' ? {
+                    from: parseInt(card.querySelector('.num-from-input').value),
+                    to: parseInt(card.querySelector('.num-to-input').value),
+                    step: parseInt(card.querySelector('.num-step-input').value)
+                } : { from: 1, to: 10, step: 1 };
+            });
+        }
+
+        // Generate attack requests using attack mode engine
+        let attackRequests;
+        try {
+            attackRequests = generateAttackRequests(currentAttackType, positionConfigs, template);
+        } catch (error) {
+            alert(`Error generating attack requests: ${error.message}`);
             return;
         }
 
-        const type = config.type;
-        let payloads = [];
+        if (attackRequests.length === 0) {
+            alert('No requests generated. Please check your payload configuration.');
+            return;
+        }
 
-        // Generate Payloads
-        if (type === 'simple-list') {
-            const text = config.list;
-            payloads = text.split('\n').filter(line => line.trim() !== '');
-        } else if (type === 'numbers') {
-            const from = parseInt(config.numbers.from);
-            const to = parseInt(config.numbers.to);
-            const step = parseInt(config.numbers.step);
-            for (let i = from; i <= to; i += step) {
-                payloads.push(i.toString());
+        // Warn for large Cluster Bomb attacks
+        if (currentAttackType === 'cluster-bomb' && attackRequests.length > 1000) {
+            if (!confirm(`This will generate ${attackRequests.length} requests. Continue?`)) {
+                return;
             }
         }
 
-        if (payloads.length === 0) {
-            alert('No payloads generated.');
-            return;
-        }
+        // Close modal
+        bulkConfigModal.style.display = 'none';
 
         // Show Pane
         bulkReplayPane.style.display = 'flex';
@@ -2312,14 +2387,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Store results for viewing
         const bulkResults = [];
 
-        // Prepare Request Template
-        // Use innerText to get newlines, but be careful with how browsers handle it.
-        const template = rawRequestInput.innerText;
         const useHttps = document.getElementById('use-https').checked;
         const scheme = useHttps ? 'https' : 'http';
 
         let completed = 0;
-        const total = payloads.length;
+        const total = attackRequests.length;
 
         for (let i = 0; i < total; i++) {
             if (shouldStopBulk) break;
@@ -2332,36 +2404,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (shouldStopBulk) break;
 
-            const payload = payloads[i];
-
-            // Construct Request Content
-            // We need to replace markers intelligently.
-            // 1. Split by markers to preserve structure? Or use a replacer function?
-            // A global replace with a counter is safest to handle identical values.
-
-            let matchCount = 0;
-            console.log(`[Bulk] Processing payload ${i}, Target Index: ${targetIndex}`);
-
-            // Use [\s\S] to match newlines as well
-            const requestContent = template.replace(/§[\s\S]*?§/g, (match) => {
-                const currentIndex = matchCount++;
-                console.log(`[Bulk] Found match: ${match}, Index: ${currentIndex}, Target: ${targetIndex}`);
-
-                if (currentIndex === targetIndex) {
-                    // This is the target: replace with payload
-                    return payload;
-                } else {
-                    // Not the target: strip markers, keep original value
-                    return match.replace(/§/g, '');
-                }
-            });
+            const { requestContent } = attackRequests[i];
 
             // Create row
             const row = document.createElement('tr');
             row.dataset.index = i;
             row.innerHTML = `
                 <td>${i + 1}</td>
-                <td>${payload}</td>
+                <td>${attackRequests[i].payloads.join(', ')}</td>
                 <td class="status-cell">Sending...</td>
                 <td class="size-cell">-</td>
                 <td class="time-cell">-</td>

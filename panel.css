@@ -458,6 +458,47 @@ body {
     margin: 4px 0 0;
 }
 
+/* Position Configuration */
+#positions-container {
+    margin-top: 10px;
+}
+
+.position-card {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.position-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.position-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent-color);
+}
+
+.position-value {
+    font-size: 11px;
+    color: #5f6368;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.position-card .form-group {
+    margin-bottom: 10px;
+}
+
+.position-card .form-group:last-child {
+    margin-bottom: 0;
+}
+
+
 /* Table Styles */
 .table-container {
     flex: 1;

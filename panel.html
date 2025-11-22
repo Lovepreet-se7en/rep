@@ -232,45 +232,59 @@
                 <button class="close-modal">&times;</button>
             </div>
             <div class="modal-body">
+                <!-- Attack Type Selection -->
+                <div class="form-group">
+                    <label>Attack Type</label>
+                    <select id="attack-type" class="form-control">
+                        <option value="sniper">Sniper - One position at a time</option>
+                        <option value="battering-ram">Battering Ram - Same payload for all positions</option>
+                        <option value="pitchfork">Pitchfork - Zip payloads across positions</option>
+                        <option value="cluster-bomb">Cluster Bomb - All combinations</option>
+                    </select>
+                    <p class="help-text" id="attack-type-help">Sniper: Tests each position independently with its own
+                        payloads.</p>
+                </div>
+
+                <!-- Payload Positions -->
                 <div class="form-group">
                     <label>Payload Positions Found: <span id="payload-count">0</span></label>
-                    <select id="payload-position-select" class="form-control" style="margin-top: 5px;">
+                    <div id="positions-container">
                         <!-- Populated via JS -->
-                    </select>
-                    <p class="help-text">Select which marked parameter (§...§) to fuzz.</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="payload-type">Payload Type</label>
-                    <select id="payload-type" class="form-control">
-                        <option value="simple-list">Simple List</option>
-                        <option value="numbers">Numbers</option>
-                    </select>
-                </div>
-
-                <!-- Simple List Options -->
-                <div id="options-simple-list" class="payload-options">
-                    <div class="form-group">
-                        <label for="payload-list">Payloads (one per line)</label>
-                        <textarea id="payload-list" class="form-control" rows="10"
-                            placeholder="admin&#10;user&#10;guest"></textarea>
                     </div>
                 </div>
 
-                <!-- Numbers Options -->
-                <div id="options-numbers" class="payload-options" style="display: none;">
-                    <div class="form-row">
+                <!-- Battering Ram: Single Shared Payload -->
+                <div id="battering-ram-config" style="display: none;">
+                    <div class="form-group">
+                        <label>Shared Payload Configuration</label>
+                        <select class="payload-type-select form-control">
+                            <option value="simple-list">Simple List</option>
+                            <option value="numbers">Numbers</option>
+                        </select>
+                    </div>
+
+                    <div class="payload-options-simple-list">
                         <div class="form-group">
-                            <label for="num-from">From</label>
-                            <input type="number" id="num-from" class="form-control" value="1">
+                            <label>Payloads (one per line)</label>
+                            <textarea class="payload-list-input form-control" rows="8"
+                                placeholder="admin&#10;user&#10;guest"></textarea>
                         </div>
-                        <div class="form-group">
-                            <label for="num-to">To</label>
-                            <input type="number" id="num-to" class="form-control" value="100">
-                        </div>
-                        <div class="form-group">
-                            <label for="num-step">Step</label>
-                            <input type="number" id="num-step" class="form-control" value="1">
+                    </div>
+
+                    <div class="payload-options-numbers" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>From</label>
+                                <input type="number" class="num-from-input form-control" value="1">
+                            </div>
+                            <div class="form-group">
+                                <label>To</label>
+                                <input type="number" class="num-to-input form-control" value="100">
+                            </div>
+                            <div class="form-group">
+                                <label>Step</label>
+                                <input type="number" class="num-step-input form-control" value="1">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -283,6 +297,7 @@
 
     <script src="html2canvas.min.js"></script>
     <script src="syntax-highlight.js"></script>
+    <script src="attack-modes.js"></script>
     <script src="panel.js"></script>
 </body>
 
