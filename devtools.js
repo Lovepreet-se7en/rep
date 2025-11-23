@@ -1,5 +1,5 @@
 chrome.devtools.panels.create(
-    "Rep+",
+    "Rep++",
     "icons/icon16.png",
     "panel.html",
     function (panel) {
