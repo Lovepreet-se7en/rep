@@ -1156,6 +1156,43 @@ pre {
     overflow-x: auto;
 }
 
+/* AI Menu Dropdown */
+.dropdown-menu-container {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: var(--sidebar-bg);
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    z-index: 100;
+    padding: 4px 0;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    color: var(--text-color);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dropdown-item:hover {
+    background-color: var(--hover-color);
+}
+
 
 
 /* AI Explanation Styles */

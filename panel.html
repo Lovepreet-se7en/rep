@@ -74,13 +74,24 @@
                     <div class="pane-header">
                         <h3>Request</h3>
                         <div class="header-actions">
-                            <button id="explain-btn" class="icon-btn" title="Ask AI to explain this request">
-                                <svg viewBox="0 0 24 24" width="16" height="16">
-                                    <path
-                                        d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"
-                                        fill="currentColor" />
-                                </svg>
-                            </button>
+                            <div class="dropdown-menu-container">
+                                <button id="ai-menu-btn" class="icon-btn" title="AI Actions">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path
+                                            d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"
+                                            fill="currentColor" />
+                                    </svg>
+                                    <span style="font-size: 10px; margin-left: 2px;">▼</span>
+                                </button>
+                                <div id="ai-menu-dropdown" class="dropdown-content">
+                                    <div class="dropdown-item" id="explain-btn">
+                                        <span>✨ Explain Request</span>
+                                    </div>
+                                    <div class="dropdown-item" id="suggest-attack-btn">
+                                        <span>🎯 Suggest Attack Vectors</span>
+                                    </div>
+                                </div>
+                            </div>
                             <button id="bulk-replay-btn" class="icon-btn"
                                 title="Bulk Replay - Mark parameters with § to start attack" disabled>
                                 <svg viewBox="0 0 24 24" width="16" height="16">

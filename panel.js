@@ -2615,11 +2615,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Explain Request
+    // AI Menu & Actions
+    const aiMenuBtn = document.getElementById('ai-menu-btn');
+    const aiMenuDropdown = document.getElementById('ai-menu-dropdown');
     const explainBtn = document.getElementById('explain-btn');
+    const suggestAttackBtn = document.getElementById('suggest-attack-btn');
     const explanationModal = document.getElementById('explanation-modal');
     const explanationContent = document.getElementById('explanation-content');
 
+    // Toggle Menu
+    if (aiMenuBtn && aiMenuDropdown) {
+        aiMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            aiMenuDropdown.classList.toggle('show');
+        });
+
+        // Close menu when clicking outside
+        window.addEventListener('click', () => {
+            if (aiMenuDropdown.classList.contains('show')) {
+                aiMenuDropdown.classList.remove('show');
+            }
+        });
+    }
+
+    // Action: Explain Request
     if (explainBtn) {
         explainBtn.addEventListener('click', async () => {
             const apiKey = localStorage.getItem('anthropic_api_key');
@@ -2642,6 +2661,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 await streamExplanationFromClaude(apiKey, model, requestContent, (text) => {
+                    if (typeof marked !== 'undefined') {
+                        explanationContent.innerHTML = marked.parse(text);
+                    } else {
+                        explanationContent.innerHTML = `<pre style="white-space: pre-wrap; font-family: sans-serif;">${text}</pre>`;
+                    }
+                });
+            } catch (error) {
+                explanationContent.innerHTML = `<div style="color: var(--error-color); padding: 20px;">Error: ${error.message}</div>`;
+            }
+        });
+    }
+
+    // Action: Suggest Attack Vectors
+    if (suggestAttackBtn) {
+        suggestAttackBtn.addEventListener('click', async () => {
+            const apiKey = localStorage.getItem('anthropic_api_key');
+            const model = localStorage.getItem('anthropic_model') || 'claude-3-5-sonnet-20241022';
+
+            if (!apiKey) {
+                alert('Please configure your Anthropic API Key in Settings first.');
+                settingsModal.style.display = 'block';
+                return;
+            }
+
+            const requestContent = rawRequestInput.innerText;
+            if (!requestContent.trim()) {
+                alert('Request is empty.');
+                return;
+            }
+
+            explanationModal.style.display = 'block';
+            explanationContent.innerHTML = '<div class="loading-spinner">Generating security checklist...</div>';
+
+            try {
+                const prompt = `Analyze this HTTP request for potential security vulnerabilities. Provide a prioritized checklist of specific attack vectors to test. For each item, specify the target parameter/header, the potential vulnerability (e.g., IDOR, SQLi, XSS), and a brief test instruction. Format the output as a clear Markdown checklist.`;
+
+                await streamExplanationFromClaude(apiKey, model, prompt + "\n\n" + requestContent, (text) => {
                     if (typeof marked !== 'undefined') {
                         explanationContent.innerHTML = marked.parse(text);
                     } else {
