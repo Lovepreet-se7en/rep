@@ -443,6 +443,11 @@
                     <button class="extractor-tab active" data-tab="secrets">Secrets</button>
                     <button class="extractor-tab" data-tab="endpoints">Endpoints</button>
                 </div>
+                <div id="domain-filter-container" style="margin: 0 10px; display: none;">
+                    <select id="domain-filter" class="domain-filter-select">
+                        <option value="all">All Domains</option>
+                    </select>
+                </div>
                 <div id="extractor-search-container" style="flex: 1; margin: 0 20px; display: none;">
                     <input type="text" id="extractor-search" class="search-input" placeholder="Search..."
                         style="width: 100%;">
@@ -462,6 +467,7 @@
                     <div id="secrets-results">
                         <div class="empty-state">No secrets found yet. Click "Scan" to start.</div>
                     </div>
+                    <div id="secrets-pagination" class="pagination-container" style="display: none;"></div>
                     <p class="disclaimer-text"
                         style="margin-top: 15px; font-size: 11px; color: #888; border-top: 1px solid var(--border-color); padding-top: 10px;">
                         <strong>Disclaimer:</strong> Automated scanning may produce false positives. Please manually
@@ -474,6 +480,7 @@
                     <div id="endpoints-results">
                         <div class="empty-state">No endpoints found yet. Click "Scan" to start.</div>
                     </div>
+                    <div id="endpoints-pagination" class="pagination-container" style="display: none;"></div>
                     <p class="disclaimer-text"
                         style="margin-top: 15px; font-size: 11px; color: #888; border-top: 1px solid var(--border-color); padding-top: 10px;">
                         <strong>Note:</strong> Endpoint extraction uses pattern matching and may include some false

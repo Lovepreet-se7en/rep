@@ -1974,3 +1974,41 @@ pre {
     opacity: 1;
     color: #f4b400;
 }
+
+/* Domain Filter Dropdown */
+.domain-filter-select {
+    padding: 6px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--sidebar-bg);
+    color: var(--text-color);
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.domain-filter-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.domain-filter-select option {
+    background: var(--sidebar-bg);
+    color: var(--text-color);
+}
+
+/* Pagination Styles */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+}
+
+.pagination-info {
+    color: var(--text-color);
+    font-weight: 500;
+}

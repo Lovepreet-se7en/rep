@@ -187,4 +187,3 @@ If **rep+ saved you time** during testing, development, or bug bounty work, plea
     <img src="https://img.shields.io/badge/Bitcoin%20Sponsor-₿-f7931a?style=for-the-badge&logo=bitcoin&logoColor=white" alt="Bitcoin Sponsor"/>
   </a>
 </p>
-
